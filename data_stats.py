@@ -19,7 +19,7 @@ def get_data_dict_from_csv(csv_file):
 
     for row in reader:
         for h, v in zip(headers, row): 
-            data_dict[h].append(v)
+            data_dict[h].append(v.lower())
     
     return data_dict
 
@@ -104,4 +104,129 @@ data_separator(closure_labels, closure_dict, data_dict_casual, data_dict_reddit)
 import matplotlib
 import matplotlib.pyplot as plt
 import numpy as np
+import collections
+import pandas as pd
 
+import plotly.plotly as py
+import plotly.graph_objs as go
+
+def show_bar_chart(input_data, xlabel, ylabel, title):
+
+    y_pos = list( dict.fromkeys(input_data))
+    performance = collections.Counter(input_data).values()
+
+    plt.bar(y_pos, performance, align='center', alpha=0.5)
+    plt.xticks(y_pos, input_data, rotation='vertical')
+    plt.ylabel(ylabel)
+    plt.xlabel(xlabel)
+    plt.title(title)
+
+    plt.show()
+
+def get_likert_scales_list(input_dict, label_list):
+    all_likert_values_list = []
+    for label in label_list:
+        data = input_dict[label]
+        y_pos = list(dict.fromkeys(data))
+        performance = collections.Counter(data).values()
+        individual_results_dict = {}
+        for y, p in zip(y_pos, performance):
+            individual_results_dict[y] = p
+        
+        if "strongly disagree" not in individual_results_dict.keys():
+            individual_results_dict["strongly disagree"] = 0
+        if "disagree" not in individual_results_dict.keys():
+            individual_results_dict["disagree"] = 0
+        if "neutral" not in individual_results_dict.keys():
+            individual_results_dict["neutral"] = 0
+        if "agree" not in individual_results_dict.keys():
+            individual_results_dict["agree"] = 0
+        if "strongly agree" not in individual_results_dict.keys():
+            individual_results_dict["strongly agree"] = 0
+        if "no answer" not in individual_results_dict.keys():
+            individual_results_dict["no answer"] = 0
+
+        individual_results_list = [individual_results_dict["strongly disagree"], individual_results_dict["disagree"], individual_results_dict["neutral"],
+        individual_results_dict["agree"], individual_results_dict["strongly agree"], individual_results_dict["no answer"]]
+        
+        all_likert_values_list.append(individual_results_list)
+    return all_likert_values_list
+
+def likert_scale_plot(input_list, title):
+    likert_colors = ['white', 'firebrick','lightcoral','gainsboro','cornflowerblue', 'darkblue']
+    data = pd.DataFrame([input_list[0], input_list[1], input_list[2]],
+                    columns=["Strongly Disagree", "Disagree", "Neutral", "Agree", "Strongly Agree", "No Answer"],
+                    index=["The visualizations are understandable.", 
+                    "The visualizations are useful.", "I would use this part of the dashboard."])
+    middles = data[["Strongly Disagree", "Disagree"]].sum(axis=1)+data["Neutral"]*.5
+    longest = middles.max()
+    
+    complete_longest = data.sum(axis=1).max()
+    data.insert(0, '', (middles - longest).abs())
+
+    data.plot.barh(stacked=True, color=likert_colors, edgecolor='none', legend=False)
+    z = plt.axvline(longest, linestyle='--', color='black', alpha=.5)
+    z.set_zorder(-1)
+
+    plt.xlim(0, complete_longest)
+    xvalues = range(0,complete_longest,10)
+    xlabels = [str(x-longest) for x in xvalues]
+    plt.xticks(xvalues, xlabels)
+    plt.title(title)
+    plt.legend(loc='center left', bbox_to_anchor=(1, 0.5))
+    plt.show()
+
+### Demongraphic graphics
+
+# how did you find this survey
+input_data = sorted(demographic_dict["How did you find this survey (e.g., \"personal contact\", \"forum X\", \"r/catlolz\", ...)?"])
+show_bar_chart(input_data, '', '', 'How did you find this survey?')
+
+# age
+
+# gender
+
+# highest degree
+
+# role
+
+# programming language
+
+# professional coding experience
+
+#%%
+
+# activity what 
+input_data = get_likert_scales_list(activity_what_dict, ["activity_what_[The visualizations are understandable.]", 
+"activity_what_[The visualizations are useful.]", "activity_what_[I would use this part of the dashboard.]"])
+likert_scale_plot(input_data, "Activity Type")
+
+# activity where
+input_data = get_likert_scales_list(activity_where_dict, ["activity_where_[The visualizations are understandable.]", 
+"activity_where_[The visualizations are useful.]", "activity_where_[I would use this part of the dashboard.]"])
+likert_scale_plot(input_data, "Activity Location")
+
+# written tests
+input_data = get_likert_scales_list(testing_written_dict, ["testing_written_[The visualization is understandable.]", 
+"testing_written_[The visualization is useful.]", "testing_written_[I would use this part of the dashboard.]"])
+likert_scale_plot(input_data, "Written Tests")
+
+# TDD tests
+input_data = get_likert_scales_list(testing_tdd_dict, ["testing_tdd_[The visualization is understandable.]",
+"testing_tdd_[The visualization is useful.]", "testing_tdd_[I would use this part of the dashboard.]"])
+likert_scale_plot(input_data, "TDD cycles")
+
+# global stats
+input_data = get_likert_scales_list(global_stats_dict, ["global_stats_[The table is understandable.]",
+"global_stats_[The table is useful.]", "global_stats_[I would use this part of the dashboard.]"])
+likert_scale_plot(input_data, "Global Statistics")
+
+# privacy
+input_data = get_likert_scales_list(privacy_dict, ["privacy_[The privacy settings are understandable.]", 
+"privacy_[The privacy settings are useful.]", "privacy_[I would use this part of the dashboard.]"])
+likert_scale_plot(input_data, "Privacy Settings")
+
+# closure
+input_data = sorted(closure_dict[" [I would use the dashboard I just saw.]"])
+show_bar_chart(input_data, '', '', 'I would use the dashboard I just saw.')
+#%%
