@@ -111,17 +111,60 @@ import plotly.plotly as py
 import plotly.graph_objs as go
 
 def show_bar_chart(input_data, xlabel, ylabel, title):
-
     y_pos = list( dict.fromkeys(input_data))
-    performance = collections.Counter(input_data).values()
-
+    performance = list(collections.Counter(input_data).values())
     plt.bar(y_pos, performance, align='center', alpha=0.5)
-    plt.xticks(y_pos, input_data, rotation='vertical')
+    plt.xticks(rotation='vertical')
     plt.ylabel(ylabel)
     plt.xlabel(xlabel)
     plt.title(title)
+    fig = plt.gcf()
+    plt.show()
+    fig.savefig('figures/bar-charts/' + title + '.png', bbox_inches='tight', dpi=300)
+
+def show_grouped_bar_chart(labels, input_list_1, input_list_2, label_1, label_2):
+    """
+    Code taken and modified from: https://matplotlib.org/3.1.1/gallery/lines_bars_and_markers/barchart.html#sphx-glr-gallery-lines-bars-and-markers-barchart-py
+    Last visited: 16.07.2019
+    """
+
+    x = np.arange(len(labels))  # the label locations
+    width = 0.35  # the width of the bars
+
+    fig, ax = plt.subplots()
+    rects1 = ax.bar(x - width/2, input_list_1, width, label=label_1)
+    rects2 = ax.bar(x + width/2, input_list_2, width, label=label_2)
+
+    # Add some text for labels, title and custom x-axis tick labels, etc.
+    ax.set_ylabel('Scores')
+    ax.set_title('Scores by group and gender')
+    ax.set_xticks(x)
+    ax.set_xticklabels(labels)
+    ax.legend()
+
+    autolabel(rects1, ax)
+    autolabel(rects2, ax)
+
+    fig.tight_layout()
 
     plt.show()
+
+
+def autolabel(rects, ax):
+    """
+    Attach a text label above each bar in *rects*, displaying its height.
+    Code taken from: https://matplotlib.org/3.1.1/gallery/lines_bars_and_markers/barchart.html#sphx-glr-gallery-lines-bars-and-markers-barchart-py
+    Last visited: 16.07.2019
+    """
+    for rect in rects:
+        height = rect.get_height()
+        ax.annotate('{}'.format(height),
+                    xy=(rect.get_x() + rect.get_width() / 2, height),
+                    xytext=(0, 3),  # 3 points vertical offset
+                    textcoords="offset points",
+                    ha='center', va='bottom')
+
+
 
 def get_likert_scales_list(input_dict, label_list):
     all_likert_values_list = []
@@ -153,6 +196,11 @@ def get_likert_scales_list(input_dict, label_list):
     return all_likert_values_list
 
 def likert_scale_plot(input_list, title):
+    """
+    Generate a likert scale plot for three inputs.
+    Code taken and modified from: https://stackoverflow.com/questions/23142358/create-a-diverging-stacked-bar-chart-in-matplotlib
+    Last visited: 16.07.2019
+    """
     likert_colors = ['white', 'firebrick','lightcoral','gainsboro','cornflowerblue', 'darkblue']
     data = pd.DataFrame([input_list[0], input_list[1], input_list[2]],
                     columns=["Strongly Disagree", "Disagree", "Neutral", "Agree", "Strongly Agree", "No Answer"],
@@ -174,17 +222,52 @@ def likert_scale_plot(input_list, title):
     plt.xticks(xvalues, xlabels)
     plt.title(title)
     plt.legend(loc='center left', bbox_to_anchor=(1, 0.5))
+    fig = plt.gcf()
     plt.show()
+    fig.savefig('figures/likerts-charts/' + title + '.png', bbox_inches='tight', dpi=300)
+
+#%%
 
 ### Demongraphic graphics
 
+finding_survey_list = sorted(demographic_dict["How did you find this survey (e.g., \"personal contact\", \"forum X\", \"r/catlolz\", ...)?"])
+
+gender_list = demographic_dict["What is your gender? "]
+age_list = demographic_dict["How old are you?"]
+degree_list = demographic_dict["What is your highest degree?"]
+role_list = demographic_dict["Which of the following best describes your role?"]
+programming_lang_list = demographic_dict["What is your main programming language?"]
+coding_exp_list = demographic_dict["How many years of professional coding experience do you have? "]
+
 # how did you find this survey
-input_data = sorted(demographic_dict["How did you find this survey (e.g., \"personal contact\", \"forum X\", \"r/catlolz\", ...)?"])
-show_bar_chart(input_data, '', '', 'How did you find this survey?')
+show_bar_chart(sorted(finding_survey_list), '', '', 'How did you find this survey?')
+show_bar_chart(sorted(gender_list), '', '', 'Gender Distribution')
+show_bar_chart(sorted(age_list), '', '', 'Age Distribution')
+show_bar_chart(sorted(degree_list), '', '', 'Degrees')
+show_bar_chart(sorted(role_list), '', '', 'Roles')
+show_bar_chart(sorted(programming_lang_list), '', '', 'Main Programming Lanugages')
+show_bar_chart(sorted(coding_exp_list), '', '', 'Years of Coding Experiences')
 
 # age
 
 # gender
+# female_degree_list = []
+# male_degree_list = []
+# for gender, degree in zip(gender_list, degree_list):
+#     if gender == 'male':
+#         male_degree_list.append(degree)
+#     if gender == 'female':
+#         female_degree_list.append(degree)
+# female_degree_list.sort()
+# male_degree_list.sort()
+# male_performance = list(collections.Counter(male_degree_list).values())
+# female_performance = list(collections.Counter(female_degree_list).values())
+
+# degrees = list(dict.fromkeys(sorted(degree_list)))
+# print(male_performance)
+# print(female_performance)
+# print(degrees)
+# show_grouped_bar_chart(degrees, male_performance, female_performance, 'Male', 'Female')
 
 # highest degree
 
@@ -195,6 +278,8 @@ show_bar_chart(input_data, '', '', 'How did you find this survey?')
 # professional coding experience
 
 #%%
+
+### Likert Scale Questions
 
 # activity what 
 input_data = get_likert_scales_list(activity_what_dict, ["activity_what_[The visualizations are understandable.]", 
