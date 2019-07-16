@@ -106,6 +106,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 import collections
 import pandas as pd
+import re
 
 import plotly.plotly as py
 import plotly.graph_objs as go
@@ -230,16 +231,26 @@ def likert_scale_plot(input_list, title):
 
 ### Demongraphic graphics
 
-finding_survey_list = sorted(demographic_dict["How did you find this survey (e.g., \"personal contact\", \"forum X\", \"r/catlolz\", ...)?"])
-
+finding_survey_list = demographic_dict["How did you find this survey (e.g., \"personal contact\", \"forum X\", \"r/catlolz\", ...)?"]
 gender_list = demographic_dict["What is your gender? "]
 age_list = demographic_dict["How old are you?"]
 degree_list = demographic_dict["What is your highest degree?"]
+
+# fuse all different variations of writing bachelor and master together
+pattern_bachelor = re.compile(".*(bachelor|bsc).*")
+pattern_master = re.compile(".*master.*")
+for index, degree in enumerate(degree_list):
+    if pattern_bachelor.match(degree):
+        degree_list[index] = "bachelor"
+    if pattern_master.match(degree):
+        degree_list[index] = "master"
+
+#%%
+
 role_list = demographic_dict["Which of the following best describes your role?"]
 programming_lang_list = demographic_dict["What is your main programming language?"]
 coding_exp_list = demographic_dict["How many years of professional coding experience do you have? "]
 
-# how did you find this survey
 show_bar_chart(sorted(finding_survey_list), '', '', 'How did you find this survey?')
 show_bar_chart(sorted(gender_list), '', '', 'Gender Distribution')
 show_bar_chart(sorted(age_list), '', '', 'Age Distribution')
@@ -248,9 +259,6 @@ show_bar_chart(sorted(role_list), '', '', 'Roles')
 show_bar_chart(sorted(programming_lang_list), '', '', 'Main Programming Lanugages')
 show_bar_chart(sorted(coding_exp_list), '', '', 'Years of Coding Experiences')
 
-# age
-
-# gender
 # female_degree_list = []
 # male_degree_list = []
 # for gender, degree in zip(gender_list, degree_list):
@@ -268,14 +276,6 @@ show_bar_chart(sorted(coding_exp_list), '', '', 'Years of Coding Experiences')
 # print(female_performance)
 # print(degrees)
 # show_grouped_bar_chart(degrees, male_performance, female_performance, 'Male', 'Female')
-
-# highest degree
-
-# role
-
-# programming language
-
-# professional coding experience
 
 #%%
 
