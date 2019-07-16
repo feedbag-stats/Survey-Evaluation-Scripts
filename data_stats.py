@@ -202,7 +202,7 @@ def likert_scale_plot(input_list, title):
     Code taken and modified from: https://stackoverflow.com/questions/23142358/create-a-diverging-stacked-bar-chart-in-matplotlib
     Last visited: 16.07.2019
     """
-    likert_colors = ['white', 'firebrick','lightcoral','gainsboro','cornflowerblue', 'darkblue']
+    likert_colors = ['black', 'firebrick','lightcoral','gainsboro','cornflowerblue', 'darkblue', 'green']
     data = pd.DataFrame([input_list[0], input_list[1], input_list[2]],
                     columns=["Strongly Disagree", "Disagree", "Neutral", "Agree", "Strongly Agree", "No Answer"],
                     index=["The visualizations are understandable.", 
@@ -237,19 +237,27 @@ age_list = demographic_dict["How old are you?"]
 degree_list = demographic_dict["What is your highest degree?"]
 
 # fuse all different variations of writing bachelor and master together
-pattern_bachelor = re.compile(".*(bachelor|bsc).*")
-pattern_master = re.compile(".*master.*")
-for index, degree in enumerate(degree_list):
-    if pattern_bachelor.match(degree):
-        degree_list[index] = "bachelor"
-    if pattern_master.match(degree):
-        degree_list[index] = "master"
-
-#%%
+try:
+    pattern_bachelor = re.compile("(.*bachelor.*|.*bsc.*)")
+    pattern_master = re.compile(".*master.*")
+    for index, degree in enumerate(degree_list):
+        if pattern_bachelor.match(degree):
+            degree_list[index] = "bachelor"
+        if pattern_master.match(degree):
+            degree_list[index] = "master"
+except:
+    pass
 
 role_list = demographic_dict["Which of the following best describes your role?"]
 programming_lang_list = demographic_dict["What is your main programming language?"]
 coding_exp_list = demographic_dict["How many years of professional coding experience do you have? "]
+
+# fuse some similar expressions
+try:
+    coding_exp_list[coding_exp_list.index('0.5 years')] = '<1'
+    coding_exp_list[coding_exp_list.index('less than a year')] = '<1'
+except:
+    pass
 
 show_bar_chart(sorted(finding_survey_list), '', '', 'How did you find this survey?')
 show_bar_chart(sorted(gender_list), '', '', 'Gender Distribution')
