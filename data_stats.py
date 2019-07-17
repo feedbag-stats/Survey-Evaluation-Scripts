@@ -195,17 +195,25 @@ def get_likert_scales_list(input_dict, label_list):
         all_likert_values_list.append(individual_results_list)
     return all_likert_values_list
 
-def likert_scale_plot(input_list, title):
+def show_likert_scale_plot(input_list, title, number_of_inputs):
     """
-    Generate a likert scale plot for three inputs.
+    Generate a likert scale plot for one or three inputs.
     Code taken and modified from: https://stackoverflow.com/questions/23142358/create-a-diverging-stacked-bar-chart-in-matplotlib
     Last visited: 16.07.2019
     """
     likert_colors = ['black', 'firebrick','lightcoral','gainsboro','cornflowerblue', 'darkblue', 'green']
-    data = pd.DataFrame([input_list[0], input_list[1], input_list[2]],
+    if number_of_inputs == 3:
+        data = pd.DataFrame([input_list[0], input_list[1], input_list[2]],
                     columns=["Strongly Disagree", "Disagree", "Neutral", "Agree", "Strongly Agree", "No Answer"],
                     index=["The visualizations are understandable.", 
                     "The visualizations are useful.", "I would use this part of the dashboard."])
+    elif number_of_inputs == 1:
+        data = pd.DataFrame([input_list[0]],
+                    columns=["Strongly Disagree", "Disagree", "Neutral", "Agree", "Strongly Agree", "No Answer"],
+                    index=["I would use the dashboard I just saw."])
+    else:
+        return
+        
     middles = data[["Strongly Disagree", "Disagree"]].sum(axis=1)+data["Neutral"]*.5
     longest = middles.max()
     
@@ -291,34 +299,36 @@ show_bar_chart(sorted(coding_exp_list), '', '', 'Years of Coding Experiences')
 # activity what 
 input_data = get_likert_scales_list(activity_what_dict, ["activity_what_[The visualizations are understandable.]", 
 "activity_what_[The visualizations are useful.]", "activity_what_[I would use this part of the dashboard.]"])
-likert_scale_plot(input_data, "Activity Type")
+show_likert_scale_plot(input_data, "Activity Type", 3)
 
 # activity where
 input_data = get_likert_scales_list(activity_where_dict, ["activity_where_[The visualizations are understandable.]", 
 "activity_where_[The visualizations are useful.]", "activity_where_[I would use this part of the dashboard.]"])
-likert_scale_plot(input_data, "Activity Location")
+show_likert_scale_plot(input_data, "Activity Location", 3)
 
 # written tests
 input_data = get_likert_scales_list(testing_written_dict, ["testing_written_[The visualization is understandable.]", 
 "testing_written_[The visualization is useful.]", "testing_written_[I would use this part of the dashboard.]"])
-likert_scale_plot(input_data, "Written Tests")
+show_likert_scale_plot(input_data, "Written Tests", 3)
 
 # TDD tests
 input_data = get_likert_scales_list(testing_tdd_dict, ["testing_tdd_[The visualization is understandable.]",
 "testing_tdd_[The visualization is useful.]", "testing_tdd_[I would use this part of the dashboard.]"])
-likert_scale_plot(input_data, "TDD cycles")
+show_likert_scale_plot(input_data, "TDD cycles", 3)
 
 # global stats
 input_data = get_likert_scales_list(global_stats_dict, ["global_stats_[The table is understandable.]",
 "global_stats_[The table is useful.]", "global_stats_[I would use this part of the dashboard.]"])
-likert_scale_plot(input_data, "Global Statistics")
+show_likert_scale_plot(input_data, "Global Statistics", 3)
 
 # privacy
 input_data = get_likert_scales_list(privacy_dict, ["privacy_[The privacy settings are understandable.]", 
 "privacy_[The privacy settings are useful.]", "privacy_[I would use this part of the dashboard.]"])
-likert_scale_plot(input_data, "Privacy Settings")
+show_likert_scale_plot(input_data, "Privacy Settings", 3)
 
 # closure
-input_data = sorted(closure_dict[" [I would use the dashboard I just saw.]"])
-show_bar_chart(input_data, '', '', 'I would use the dashboard I just saw.')
+# input_data = sorted(closure_dict[" [I would use the dashboard I just saw.]"])
+# show_bar_chart(input_data, '', '', 'I would use the dashboard I just saw.')
+input_data = get_likert_scales_list(closure_dict, [" [I would use the dashboard I just saw.]"])
+show_likert_scale_plot(input_data, "Privacy Settings", 1)
 #%%
