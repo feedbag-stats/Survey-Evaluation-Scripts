@@ -38,7 +38,6 @@ data_dict_reddit = get_data_dict_from_csv('data/Dashboard_Survey_v3_Reddit_Versi
 
 #%%
 
-
 def data_separator(label_list, dict_to_fill, input_list_1, input_list_2):
     '''
     Put the needed data in a seperate category dictionary 
