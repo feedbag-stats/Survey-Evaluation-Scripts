@@ -197,13 +197,14 @@ def get_likert_scales_list(input_dict, label_list):
         all_likert_values_list.append(individual_results_list)
     return all_likert_values_list
 
+#%%
 def show_likert_scale_plot(input_list, title, number_of_inputs):
     """
     Generate a likert scale plot for one or three inputs.
     Code taken and modified from: https://stackoverflow.com/questions/23142358/create-a-diverging-stacked-bar-chart-in-matplotlib
     Last visited: 16.07.2019
     """
-    likert_colors = ['black', 'firebrick','lightcoral','gainsboro','cornflowerblue', 'darkblue', 'green']
+    likert_colors = ['white', 'firebrick','lightcoral','gainsboro','cornflowerblue', 'darkblue', 'green']
     if number_of_inputs == 3:
         data = pd.DataFrame([input_list[0], input_list[1], input_list[2]],
                     columns=["Strongly Disagree", "Disagree", "Neutral", "Agree", "Strongly Agree", "No Answer"],
@@ -216,10 +217,10 @@ def show_likert_scale_plot(input_list, title, number_of_inputs):
     else:
         return
 
-    middles = data[["Strongly Disagree", "Disagree"]].sum(axis=1)+data["Neutral"]*.5
+    middles = np.sum(data[["Strongly Disagree", "Disagree"]], axis=1)+data["Neutral"]*.5
     longest = middles.max()
     
-    complete_longest = data.sum(axis=1).max()
+    complete_longest = np.sum(data, axis=1).max()
     data.insert(0, '', (middles - longest).abs())
 
     data.plot.barh(stacked=True, color=likert_colors, edgecolor='none', legend=False)
@@ -227,11 +228,13 @@ def show_likert_scale_plot(input_list, title, number_of_inputs):
     z.set_zorder(-1)
 
     plt.xlim(0, complete_longest)
-    xvalues = range(0,complete_longest,10)
+    plt.axis('equal')
+    xvalues = range(0,complete_longest,20)
     xlabels = [str(x-longest) for x in xvalues]
     plt.xticks(xvalues, xlabels)
     plt.title(title)
     plt.legend(loc='center left', bbox_to_anchor=(1, 0.5))
+
     fig = plt.gcf()
     plt.show()
     fig.savefig('figures/likerts-charts/' + title + '.png', bbox_inches='tight', dpi=300)
@@ -348,23 +351,26 @@ def generate_grouped_bar_chart(categories_len, categories_list, input_list, labe
         likert_scale_dict[likert_scale][index] += 1
 
     performance = []
-    for key, value in likert_scale_dict.items():
+    for value in likert_scale_dict.values():
         performance.append(value)
 
     show_grouped_bar_chart(categories_list, performance, 
         ['strongly agree','agree', 'neutral', 'disagree', 'strongly disagree', 'no answer'], 
         title)
 
-# coding experience with written tests
-label_list = testing_written_dict["testing_written_[The visualization is understandable.]"]
-year_list = list(dict.fromkeys(coding_exp_list))
-year_len = len(year_list)
-generate_grouped_bar_chart(year_len, year_list, coding_exp_list, label_list, 'Year of Experience - written tests: The visualization is understandable')
+def generate_grouped_bar_chart_for_coding_exp(label_list, title):
+    year_list = list(dict.fromkeys(coding_exp_list))
+    year_len = len(year_list)
+    generate_grouped_bar_chart(year_len, year_list, coding_exp_list, label_list, title)
 
-# coding experience with activity types
-label_list = activity_what_dict["activity_what_[The visualizations are understandable.]"]
-year_list = list(dict.fromkeys(coding_exp_list))
-year_len = len(year_list)
-generate_grouped_bar_chart(year_len, year_list, coding_exp_list, label_list, 'Year of Experience - activity types: The visualization is understandable')
+# written tests
+generate_grouped_bar_chart_for_coding_exp(
+    testing_written_dict["testing_written_[The visualization is understandable.]"], 
+    'Year of Experience - written tests: The visualization is understandable')
+
+# activity types 
+generate_grouped_bar_chart_for_coding_exp(
+    activity_what_dict["activity_what_[The visualizations are understandable.]"], 
+    'Year of Experience - activity types: The visualization is understandable')
 
 #%%
