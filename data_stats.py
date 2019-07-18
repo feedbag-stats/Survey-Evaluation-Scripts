@@ -114,10 +114,16 @@ def show_bar_chart(input_data, xlabel, ylabel, title):
     y_pos = list( dict.fromkeys(input_data))
     performance = list(collections.Counter(input_data).values())
     plt.bar(y_pos, performance, align='center', alpha=0.5)
+
     plt.xticks(rotation='vertical')
     plt.ylabel(ylabel)
     plt.xlabel(xlabel)
     plt.title(title)
+
+    xlocs, xlabs = plt.xticks()
+    for i, v in enumerate(performance):
+        plt.text(xlocs[i] - 0.25, v + 0.01, str(v))
+
     fig = plt.gcf()
     plt.show()
     fig.savefig('figures/bar-charts/' + title + '.png', bbox_inches='tight', dpi=300)
@@ -127,7 +133,6 @@ def show_grouped_bar_chart(labels, input_list, input_label_list, title):
     Code taken and modified from: https://matplotlib.org/3.1.1/gallery/lines_bars_and_markers/barchart.html#sphx-glr-gallery-lines-bars-and-markers-barchart-py
     Last visited: 16.07.2019
     """
-
     x = np.arange(len(labels))  # the label locations
     width = 0.35  # the width of the bars
 
@@ -266,8 +271,11 @@ coding_exp_list = demographic_dict["How many years of professional coding experi
 
 # fuse some similar expressions
 try:
-    coding_exp_list[coding_exp_list.index('0.5 years')] = '<1'
-    coding_exp_list[coding_exp_list.index('less than a year')] = '<1'
+    coding_exp_list[coding_exp_list.index('0.5 years')] = '0.5'
+    coding_exp_list[coding_exp_list.index('less than a year')] = '0.5'
+    coding_exp_list[coding_exp_list.index('<1')] = '0.5'
+    coding_exp_list[coding_exp_list.index('10+')] = '10'
+
 except:
     pass
 
@@ -276,8 +284,8 @@ show_bar_chart(sorted(gender_list), '', '', 'Gender Distribution')
 show_bar_chart(sorted(age_list), '', '', 'Age Distribution')
 show_bar_chart(sorted(degree_list), '', '', 'Degrees')
 show_bar_chart(sorted(role_list), '', '', 'Roles')
-show_bar_chart(sorted(programming_lang_list), '', '', 'Main Programming Lanugages')
-show_bar_chart(sorted(coding_exp_list), '', '', 'Years of Coding Experiences')
+show_bar_chart(sorted(programming_lang_list), '', '', 'Main Programming Languages')
+show_bar_chart(sorted(coding_exp_list, key=lambda x: float(x)), '', '', 'Years of Coding Experiences')
 
 # female_degree_list = []
 # male_degree_list = []
@@ -335,25 +343,26 @@ show_likert_scale_plot(label_list, "Privacy Settings", 3)
 # input_data = sorted(closure_dict[" [I would use the dashboard I just saw.]"])
 # show_bar_chart(input_data, '', '', 'I would use the dashboard I just saw.')
 label_list = get_likert_scales_list(closure_dict, [" [I would use the dashboard I just saw.]"])
-show_likert_scale_plot(label_list, "Privacy Settings", 1)
+show_likert_scale_plot(label_list, "Closure", 1)
 
 
 #%%
 
 ### Combined Likert Results
-
+import operator
 def generate_grouped_bar_chart(categories_len, categories_list, input_list, label_list, title):
     likert_scale_dict = {'strongly agree': [0] * categories_len, 'agree': [0] * categories_len, 'neutral': [0] * categories_len, 
         'disagree': [0] * categories_len, 'strongly disagree': [0] * categories_len, 'no answer': [0] * categories_len}
-
-    for data, likert_scale in zip(input_list, label_list):
+    
+    zipped = zip(input_list, label_list)
+    for data, likert_scale in sorted(zipped, key=operator.itemgetter(1)):
         index  = categories_list.index(data)
         likert_scale_dict[likert_scale][index] += 1
 
     performance = []
     for value in likert_scale_dict.values():
         performance.append(value)
-
+    
     show_grouped_bar_chart(categories_list, performance, 
         ['strongly agree','agree', 'neutral', 'disagree', 'strongly disagree', 'no answer'], 
         title)
