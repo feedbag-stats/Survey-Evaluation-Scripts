@@ -249,9 +249,20 @@ def show_likert_scale_plot(input_list, title, number_of_inputs):
 ### Demongraphic graphics
 
 finding_survey_list = demographic_dict["How did you find this survey (e.g., \"personal contact\", \"forum X\", \"r/catlolz\", ...)?"]
+try:
+    finding_survey_list[finding_survey_list.index('personal contact (tim)')] = 'personal contact'
+    finding_survey_list[finding_survey_list.index('friend sent it to me')] = 'personal contact'
+except:
+    pass
+
 gender_list = demographic_dict["What is your gender? "]
 age_list = demographic_dict["How old are you?"]
 degree_list = demographic_dict["What is your highest degree?"]
+try:
+    degree_list[degree_list.index('high school diploma')] = 'high school'
+
+except:
+    pass
 
 # fuse all different variations of writing bachelor and master together
 try:
