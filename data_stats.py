@@ -203,7 +203,7 @@ def get_likert_scales_list(input_dict, label_list):
     return all_likert_values_list
 
 #%%
-def show_likert_scale_plot(input_list, title, number_of_inputs):
+def show_likert_scale_plot(input_list, title, number_of_inputs, axis_type):
     """
     Generate a likert scale plot for one or three inputs.
     Code taken and modified from: https://stackoverflow.com/questions/23142358/create-a-diverging-stacked-bar-chart-in-matplotlib
@@ -233,7 +233,7 @@ def show_likert_scale_plot(input_list, title, number_of_inputs):
     z.set_zorder(-1)
 
     plt.xlim(0, complete_longest)
-    plt.axis('equal')
+    plt.axis(axis_type)
     xvalues = range(0,complete_longest,20)
     xlabels = [str(x-longest) for x in xvalues]
     plt.xticks(xvalues, xlabels)
@@ -323,74 +323,74 @@ show_bar_chart(sorted(coding_exp_list, key=lambda x: float(x)), '', '', 'Years o
 # activity what 
 label_list = get_likert_scales_list(activity_what_dict, ["activity_what_[The visualizations are understandable.]", 
 "activity_what_[The visualizations are useful.]", "activity_what_[I would use this part of the dashboard.]"])
-show_likert_scale_plot(label_list, "Activity Type", 3)
+show_likert_scale_plot(label_list, "Activity Type", 3, "tight")
 
 # activity where
 label_list = get_likert_scales_list(activity_where_dict, ["activity_where_[The visualizations are understandable.]", 
 "activity_where_[The visualizations are useful.]", "activity_where_[I would use this part of the dashboard.]"])
-show_likert_scale_plot(label_list, "Activity Location", 3)
+show_likert_scale_plot(label_list, "Activity Location", 3, "tight")
 
 # written tests
 label_list = get_likert_scales_list(testing_written_dict, ["testing_written_[The visualization is understandable.]", 
 "testing_written_[The visualization is useful.]", "testing_written_[I would use this part of the dashboard.]"])
-show_likert_scale_plot(label_list, "Written Tests", 3)
+show_likert_scale_plot(label_list, "Written Tests", 3, "tight")
 
 # TDD tests
 label_list = get_likert_scales_list(testing_tdd_dict, ["testing_tdd_[The visualization is understandable.]",
 "testing_tdd_[The visualization is useful.]", "testing_tdd_[I would use this part of the dashboard.]"])
-show_likert_scale_plot(label_list, "TDD cycles", 3)
+show_likert_scale_plot(label_list, "TDD cycles", 3, "tight")
 
 # global stats
 label_list = get_likert_scales_list(global_stats_dict, ["global_stats_[The table is understandable.]",
 "global_stats_[The table is useful.]", "global_stats_[I would use this part of the dashboard.]"])
-show_likert_scale_plot(label_list, "Global Statistics", 3)
+show_likert_scale_plot(label_list, "Global Statistics", 3, "tight")
 
 # privacy
 label_list = get_likert_scales_list(privacy_dict, ["privacy_[The privacy settings are understandable.]", 
 "privacy_[The privacy settings are useful.]", "privacy_[I would use this part of the dashboard.]"])
-show_likert_scale_plot(label_list, "Privacy Settings", 3)
+show_likert_scale_plot(label_list, "Privacy Settings", 3, "tight")
 
 # closure
 # input_data = sorted(closure_dict[" [I would use the dashboard I just saw.]"])
 # show_bar_chart(input_data, '', '', 'I would use the dashboard I just saw.')
 label_list = get_likert_scales_list(closure_dict, [" [I would use the dashboard I just saw.]"])
-show_likert_scale_plot(label_list, "Closure", 1)
+show_likert_scale_plot(label_list, "Closure", 1, "on")
 
 
 #%%
 
 ### Combined Likert Results
-import operator
-def generate_grouped_bar_chart(categories_len, categories_list, input_list, label_list, title):
-    likert_scale_dict = {'strongly agree': [0] * categories_len, 'agree': [0] * categories_len, 'neutral': [0] * categories_len, 
-        'disagree': [0] * categories_len, 'strongly disagree': [0] * categories_len, 'no answer': [0] * categories_len}
+# import operator
+# def generate_grouped_bar_chart(categories_len, categories_list, input_list, label_list, title):
+#     likert_scale_dict = {'strongly agree': [0] * categories_len, 'agree': [0] * categories_len, 'neutral': [0] * categories_len, 
+#         'disagree': [0] * categories_len, 'strongly disagree': [0] * categories_len, 'no answer': [0] * categories_len}
     
-    zipped = zip(input_list, label_list)
-    for data, likert_scale in sorted(zipped, key=operator.itemgetter(1)):
-        index  = categories_list.index(data)
-        likert_scale_dict[likert_scale][index] += 1
+#     zipped = zip(input_list, label_list)
+#     for data, likert_scale in sorted(zipped, key=operator.itemgetter(1)):
+#         index  = categories_list.index(data)
+#         likert_scale_dict[likert_scale][index] += 1
 
-    performance = []
-    for value in likert_scale_dict.values():
-        performance.append(value)
+#     performance = []
+#     for value in likert_scale_dict.values():
+#         performance.append(value)
     
-    show_grouped_bar_chart(categories_list, performance, 
-        ['strongly agree','agree', 'neutral', 'disagree', 'strongly disagree', 'no answer'], 
-        title)
+#     show_grouped_bar_chart(categories_list, performance, 
+#         ['strongly agree','agree', 'neutral', 'disagree', 'strongly disagree', 'no answer'], 
+#         title)
 
-def generate_grouped_bar_chart_for_coding_exp(label_list, title):
-    year_list = list(dict.fromkeys(coding_exp_list))
-    year_len = len(year_list)
-    generate_grouped_bar_chart(year_len, year_list, coding_exp_list, label_list, title)
+# def generate_grouped_bar_chart_for_coding_exp(label_list, title):
+#     year_list = list(dict.fromkeys(coding_exp_list))
+#     year_len = len(year_list)
+#     generate_grouped_bar_chart(year_len, year_list, coding_exp_list, label_list, title)
 
-# written tests
-generate_grouped_bar_chart_for_coding_exp(
-    testing_written_dict["testing_written_[The visualization is understandable.]"], 
-    'Year of Experience - written tests: The visualization is understandable')
+# # written tests
+# generate_grouped_bar_chart_for_coding_exp(
+#     testing_written_dict["testing_written_[The visualization is understandable.]"], 
+#     'Year of Experience - written tests: The visualization is understandable')
 
-# activity types 
-generate_grouped_bar_chart_for_coding_exp(
-    activity_what_dict["activity_what_[The visualizations are understandable.]"], 
-    'Year of Experience - activity types: The visualization is understandable')
+# # activity types 
+# generate_grouped_bar_chart_for_coding_exp(
+#     activity_what_dict["activity_what_[The visualizations are understandable.]"], 
+#     'Year of Experience - activity types: The visualization is understandable')
 
 #%%
